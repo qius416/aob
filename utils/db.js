@@ -11,10 +11,11 @@ exports.db = function() {
       timeout: 60000
     });
     db = require('nano')({
-      "url": "http://localhost:5984",
+      "url": "http://192.168.1.3:5984",
       "requestDefaults": {
         "agent": myagent
-      }//,"log": function (id, args) {console.log(id, args);}
+      },
+      "log": function (id, args) {console.log(id, args);}
     });
   }
   return db;

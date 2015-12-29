@@ -1,4 +1,14 @@
 var fs = require("fs");
+var client = require('scp2');
+var Imagemin = require('imagemin');
+var imageminPngquant = require('imagemin-pngquant');
+var rename = require('gulp-rename');
+client.defaults({
+    port: 22,
+    host: '192.168.1.3',
+    username: 'qiushi',
+    password: 'Edc9ce26'
+});
 
 function decodeBase64Image(dataString) {
   var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
@@ -16,12 +26,29 @@ function decodeBase64Image(dataString) {
 
 exports.upload = function(data) {
   var buf = decodeBase64Image(data.image);
-  var path = process.env.upload_path;
-  //if(!path){
-  //  path = 'C:\\Users\\kouky_000\\dev\\upload\\';
-  //}
-  //fs.writeFile(data.name + "." + buf.type, buf.data, function(err) {
-  fs.writeFile(path + data.name + '.png', buf.data, function(err) {
-    if(err) throw err;
-  });
+  new Imagemin().src(buf.data)
+                .use(rename(data.name))
+                .dest('../devfront/app/images/attach/')
+                .use(imageminPngquant({quality: '65-80', speed: 4}))
+                .run(sendFile);
+  function sendFile(err,files){
+    if(err){
+      console.log(err);
+      throw err;
+    }
+    var name = '/usr/share/nginx/axiomone/images/attach/' + data.name;
+    client.write({
+    destination: name,
+    content: files[0].contents}, delTmp);
+  }
+  function delTmp(err){
+    if(err) {
+      console.log(err);
+      throw err;
+    }
+/*    fs.unlink(data.name,function(err){
+      console.log(err);
+      throw err;
+    });*/
+  }
 };
