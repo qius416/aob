@@ -1,5 +1,4 @@
 var express = require('express');
-var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var articles = require('./routes/articles');
 var blogs = require('./routes/blogs');
@@ -10,7 +9,6 @@ app.use(bodyParser.json({limit: '5mb'}));
 app.use(bodyParser.urlencoded({
   extended: false
 }));
-app.use(cookieParser());
 
 app.use('/api/article', articles);
 app.use('/api/blog', blogs);
